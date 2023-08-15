@@ -2,6 +2,7 @@ package com.swarnim.blog.services;
 
 import com.swarnim.blog.entities.Post;
 import com.swarnim.blog.payloads.PostDto;
+import com.swarnim.blog.payloads.PostResponse;
 
 import java.util.List;
 
@@ -16,7 +17,7 @@ public interface PostService {
     void deletePost(Integer postId);
 
     //Get ALl Post
-    List<PostDto> getAllPost(Integer pageNumber, Integer pageSize);
+    PostResponse getAllPost(Integer pageNumber, Integer pageSize, String sortBy, String sortDir);
 
     //Get Single Post
     PostDto getPostById(Integer postId);
@@ -28,5 +29,5 @@ public interface PostService {
     List<PostDto> getAllPostByUser(Integer userId);
 
     //SearchPost
-    List<Post> searchPost(String keyword);
+    List<PostDto> searchPost(String keyword);
 }
