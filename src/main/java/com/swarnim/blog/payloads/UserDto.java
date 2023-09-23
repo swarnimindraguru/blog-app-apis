@@ -1,11 +1,18 @@
 package com.swarnim.blog.payloads;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonView;
+import com.swarnim.blog.entities.Role;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.HashSet;
+import java.util.Set;
 
 
 @NoArgsConstructor
@@ -23,4 +30,5 @@ public class UserDto {
     private String password;
     @NotEmpty
     private String about;
+    private Set<RoleDto> roles = new HashSet<>();
 }

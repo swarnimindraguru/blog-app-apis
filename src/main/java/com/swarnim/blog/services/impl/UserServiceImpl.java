@@ -1,12 +1,17 @@
 package com.swarnim.blog.services.impl;
+import com.swarnim.blog.config.AppConstants;
+import com.swarnim.blog.entities.Role;
 import com.swarnim.blog.exceptions.*;
 import com.swarnim.blog.entities.User;
 import com.swarnim.blog.payloads.UserDto;
 import com.swarnim.blog.repositories.UserRepo;
+import com.swarnim.blog.repositories.roleRepository;
 import com.swarnim.blog.services.UserService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,6 +22,10 @@ public class UserServiceImpl implements UserService {
     private UserRepo userRepo;
     @Autowired
     private ModelMapper modelMapper;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+    @Autowired
+    private roleRepository roleRepo;
     @Override
     public UserDto createUser(UserDto userDto) {
         User user = this.dtoToUser(userDto);
@@ -74,5 +83,22 @@ public class UserServiceImpl implements UserService {
 //        userDto.setAbout(user.getAbout());
         UserDto userDto = this.modelMapper.map(user, UserDto.class);
         return userDto;
+    }
+
+    @Override
+    public UserDto registerNewUSer(UserDto userDto) {
+
+        User user=modelMapper.map(userDto,User.class);
+        // password coded
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        //roles
+        SimpleJpaRepository<Object, Object> roleRepository;
+        Role role= roleRepo.findById(AppConstants.NORMAL_USER).get();
+
+        user.getRoles().add(role);
+
+        User savedUser=userRepo.save(user);
+
+        return modelMapper.map(savedUser,UserDto.class);
     }
 }

@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.PrivilegedAction;
@@ -32,6 +33,7 @@ public class UserController {
     }
 
     //DELETE
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/deleteUser/{userId}")
 //    public ResponseEntity<ApiResponse> deleteUser (@PathVariable Integer userId){
     public ResponseEntity<ApiResponse> deleteUser(@PathVariable("userId") Integer uid){
@@ -49,4 +51,5 @@ public class UserController {
     public ResponseEntity<UserDto> getSingleUser(@PathVariable Integer userId){
         return ResponseEntity.ok(this.userService.getUserById(userId));
     }
+
 }
