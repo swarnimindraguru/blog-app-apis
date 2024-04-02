@@ -74,7 +74,7 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<UserDto> registerUser(@RequestBody UserDto userDto){
 
-        UserDto registerUser=userService.registerNewUSer(userDto);
+        UserDto registerUser=userService.registerNewUser(userDto);
         return new ResponseEntity<UserDto>(registerUser,HttpStatus.CREATED);
 
     }

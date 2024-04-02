@@ -19,12 +19,14 @@ import java.util.List;
 public class UserController {
     @Autowired
     private UserService userService;
+
+    /* Not needed as we have developed RegisterUser API */
     //POST
-    @PostMapping ("/createUser")
-    public ResponseEntity<UserDto> createUser(@Valid @RequestBody UserDto userDto){
-        UserDto createdUserDto = this.userService.createUser(userDto);
-        return new ResponseEntity<>(createdUserDto, HttpStatus.CREATED);
-    }
+//    @PostMapping ("/createUser")
+//    public ResponseEntity<UserDto> createUser(@Valid @RequestBody UserDto userDto){
+//        UserDto createdUserDto = this.userService.createUser(userDto);
+//        return new ResponseEntity<>(createdUserDto, HttpStatus.CREATED);
+//    }
     //PUT
     @PutMapping("/updateUser/{userId}")
     public ResponseEntity<UserDto> updateUser(@Valid @RequestBody UserDto userDto, @PathVariable("userId")Integer uid){
@@ -50,6 +52,17 @@ public class UserController {
     @GetMapping("/getUser/{userId}")
     public ResponseEntity<UserDto> getSingleUser(@PathVariable Integer userId){
         return ResponseEntity.ok(this.userService.getUserById(userId));
+    }
+
+    // UPDATE ROLE
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PutMapping("/{userID}/role/{roleID}")
+    public ResponseEntity<ApiResponse> updateRole(@PathVariable Integer userID,
+                                                     @PathVariable Integer roleID){
+        userService.updateRole(userID,roleID);
+        ApiResponse responseDto= new ApiResponse("Role Has been Updated..!", true);
+
+        return ResponseEntity.ok(responseDto);
     }
 
 }

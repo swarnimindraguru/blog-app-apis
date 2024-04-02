@@ -2,17 +2,15 @@ package com.swarnim.blog;
 
 import com.swarnim.blog.config.AppConstants;
 import com.swarnim.blog.entities.Role;
-import com.swarnim.blog.repositories.roleRepository;
+import com.swarnim.blog.repositories.RoleRepo;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-import org.springframework.core.SpringVersion;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.beans.BeanProperty;
 import java.util.List;
 
 @SpringBootApplication
@@ -21,7 +19,7 @@ public class BlogAppApisApplication implements CommandLineRunner {
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 	@Autowired
-	private roleRepository roleRepository;
+	private RoleRepo roleRepository;
 
 	public static void main(String[] args) {
 		SpringApplication.run(BlogAppApisApplication.class, args);

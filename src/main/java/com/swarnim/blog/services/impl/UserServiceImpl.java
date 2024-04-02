@@ -5,7 +5,7 @@ import com.swarnim.blog.exceptions.*;
 import com.swarnim.blog.entities.User;
 import com.swarnim.blog.payloads.UserDto;
 import com.swarnim.blog.repositories.UserRepo;
-import com.swarnim.blog.repositories.roleRepository;
+import com.swarnim.blog.repositories.RoleRepo;
 import com.swarnim.blog.services.UserService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +13,9 @@ import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,7 +27,7 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
     @Autowired
-    private roleRepository roleRepo;
+    private RoleRepo roleRepo;
     @Override
     public UserDto createUser(UserDto userDto) {
         User user = this.dtoToUser(userDto);
@@ -86,7 +88,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto registerNewUSer(UserDto userDto) {
+    public UserDto registerNewUser(UserDto userDto) {
+
+        // Check For User Exist with Given Email or not ..!
+        Optional<User> checkUser=userRepo.findByEmail(userDto.getEmail());
+        if(checkUser.isPresent()){
+            throw new ApiException("User Already Exist With Given Email");
+        }
 
         User user=modelMapper.map(userDto,User.class);
         // password coded
@@ -100,5 +108,19 @@ public class UserServiceImpl implements UserService {
         User savedUser=userRepo.save(user);
 
         return modelMapper.map(savedUser,UserDto.class);
+    }
+
+    @Override
+    public void updateRole(Integer userID, Integer roleID) {
+
+        //TODO: only admin can be updated to normal role
+
+        User user= userRepo.findById(userID).orElseThrow( ()-> new ResourceNotFoundException("User", "ID", userID));
+
+        Role role=roleRepo.findById(roleID).get();
+        user.setRoles(new HashSet<>());
+        user.getRoles().add(role);
+
+        userRepo.save(user);
     }
 }

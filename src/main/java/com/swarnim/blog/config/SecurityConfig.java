@@ -22,7 +22,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 @Configuration
 @EnableWebSecurity
-@EnableWebMvc
+@EnableWebMvc //Used for Swagger
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 
 public class SecurityConfig {
