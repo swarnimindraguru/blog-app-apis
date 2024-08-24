@@ -3,19 +3,25 @@ import com.swarnim.blog.config.AppConstants;
 import com.swarnim.blog.entities.Role;
 import com.swarnim.blog.exceptions.*;
 import com.swarnim.blog.entities.User;
+import com.swarnim.blog.payloads.ApiResponse;
 import com.swarnim.blog.payloads.UserDto;
 import com.swarnim.blog.repositories.UserRepo;
 import com.swarnim.blog.repositories.RoleRepo;
 import com.swarnim.blog.services.UserService;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -93,7 +99,7 @@ public class UserServiceImpl implements UserService {
         // Check For User Exist with Given Email or not ..!
         Optional<User> checkUser=userRepo.findByEmail(userDto.getEmail());
         if(checkUser.isPresent()){
-            throw new ApiException("User Already Exist With Given Email");
+            throw new ApiException("User Already Exist With Given Email :"+ userDto.getEmail());
         }
 
         User user=modelMapper.map(userDto,User.class);
@@ -122,5 +128,61 @@ public class UserServiceImpl implements UserService {
         user.getRoles().add(role);
 
         userRepo.save(user);
+    }
+
+    //check that file is of excel type or not
+    public boolean checkExcelFormate(MultipartFile file){
+        String contantType = file.getContentType();
+        if(contantType.equals("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")){
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    //User bulk upload from excel
+    public  ApiResponse registerUsersInBulk(MultipartFile file) throws IOException {
+        List<UserDto> list = new ArrayList<>();
+        //through this we will get the whole workbook sheet
+        XSSFWorkbook workbook = new XSSFWorkbook(file.getInputStream());
+        // from this we need a particular sheet which contains data : sheet name = data
+        XSSFSheet sheet = workbook.getSheet("data");
+        int rowNumber = 0;
+        Iterator<Row> iterator = sheet.iterator();
+        while(iterator.hasNext()){
+            Row row = iterator.next();
+            if(rowNumber ==0){
+                rowNumber++;
+                continue;
+            }
+            Iterator<Cell> cells = row.iterator();
+            int cid =0;
+
+            //user obj to store the userdata
+            UserDto userDto = new UserDto();
+
+            while(cells.hasNext()) {
+                Cell cell = cells.next();
+                switch(cid){
+                    case 0:
+                        userDto.setName(cell.getStringCellValue());
+                        break;
+                    case 1:
+                        userDto.setEmail(cell.getStringCellValue());
+                        break;
+                    case 2:
+                        userDto.setPassword(cell.getStringCellValue());
+                        break;
+                    case 3:
+                        userDto.setAbout(cell.getStringCellValue());
+                        break;
+                    default:
+                        break;
+                }
+                cid++;
+            }
+            UserDto user = this.registerNewUser(userDto);
+        }
+        return new ApiResponse("User registered!!!!!",true);
     }
 }

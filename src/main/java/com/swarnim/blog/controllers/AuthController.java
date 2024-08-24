@@ -1,5 +1,6 @@
 package com.swarnim.blog.controllers;
 
+import com.swarnim.blog.entities.User;
 import com.swarnim.blog.exceptions.ApiException;
 import com.swarnim.blog.payloads.JwtAuthRequest;
 import com.swarnim.blog.payloads.JwtAuthResponse;
@@ -73,7 +74,6 @@ public class AuthController {
 //    register new user api
     @PostMapping("/register")
     public ResponseEntity<UserDto> registerUser(@RequestBody UserDto userDto){
-
         UserDto registerUser=userService.registerNewUser(userDto);
         return new ResponseEntity<UserDto>(registerUser,HttpStatus.CREATED);
 

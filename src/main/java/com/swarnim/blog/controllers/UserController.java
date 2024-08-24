@@ -4,13 +4,16 @@ import com.swarnim.blog.entities.User;
 import com.swarnim.blog.payloads.ApiResponse;
 import com.swarnim.blog.payloads.UserDto;
 import com.swarnim.blog.services.UserService;
+import com.swarnim.blog.services.impl.UserServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.security.PrivilegedAction;
 import java.util.List;
 
@@ -19,6 +22,8 @@ import java.util.List;
 public class UserController {
     @Autowired
     private UserService userService;
+    @Autowired
+    private UserServiceImpl userServiceImpl;
 
     /* Not needed as we have developed RegisterUser API */
     //POST
@@ -65,4 +70,15 @@ public class UserController {
         return ResponseEntity.ok(responseDto);
     }
 
+    //POST - USER Bulk Register
+        @PostMapping ("/userBulkRegister")
+    public ResponseEntity<ApiResponse> userBulkRegister(@RequestParam("file") MultipartFile file) throws IOException {
+        if(userServiceImpl.checkExcelFormate(file)){
+            userService.registerUsersInBulk(file);
+            ApiResponse response= new ApiResponse("Users are successfully registered", true);
+            return ResponseEntity.ok(response);
+        }
+        ApiResponse response= new ApiResponse("Please Upload a .xlsx file", false);
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
 }
